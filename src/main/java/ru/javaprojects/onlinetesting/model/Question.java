@@ -59,4 +59,11 @@ public class Question extends AbstractBaseEntity {
     public void setAnswers(List<Answer> answers) {
         this.answers = answers;
     }
+
+    public String getCorrectAnswer() {
+        return answers.stream()
+                .filter(Answer::isCorrect)
+                .map(Answer::getContent)
+                .findFirst().orElseThrow(() -> new IllegalStateException("question does not have correct answer"));
+    }
 }

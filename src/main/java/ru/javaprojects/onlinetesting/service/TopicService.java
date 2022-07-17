@@ -8,7 +8,6 @@ import java.util.List;
 
 @Service
 public class TopicService {
-
     private TopicRepository repository;
 
     public TopicService(TopicRepository repository) {
