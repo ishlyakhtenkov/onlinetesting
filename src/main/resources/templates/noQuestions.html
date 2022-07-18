@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="fragments/head-fragment"></head>
+
+    <body class="d-flex flex-column min-vh-100">
+        <div th:replace="fragments/header-fragment"></div>
+
+        <div class="container mt-3 mb-4">
+            <h2 class="text-danger mb-3" th:text="'No questions found for topic: ' + ${topicName}"></h2>
+            <a th:href="@{/}" class="btn btn-danger">Back to Home</a>
+        </div>
+
+        <div th:replace="fragments/footer-fragment"></div>
+    </body>
+</html>

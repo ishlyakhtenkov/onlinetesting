@@ -15,8 +15,8 @@ public class QuestionService {
         this.repository = repository;
     }
 
-    public List<Question> getAll(String topic) {
-        Assert.notNull(topic, "topic must not be null");
-        return repository.findAllByTopicName(topic);
+    public List<Question> getAll(String topicName) {
+        Assert.notNull(topicName, "topicName must not be null");
+        return repository.findAllByTopicName(topicName);
     }
 }
