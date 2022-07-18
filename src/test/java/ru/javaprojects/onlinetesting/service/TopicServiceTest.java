@@ -8,17 +8,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import ru.javaprojects.onlinetesting.model.Topic;
-import ru.javaprojects.onlinetesting.testdata.TopicTestData;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static ru.javaprojects.onlinetesting.testdata.TopicTestData.historyTopic;
 import static ru.javaprojects.onlinetesting.testdata.TopicTestData.mathTopic;
 
 @SpringBootTest
 @ActiveProfiles("dev")
-@Sql(scripts = "classpath:data.sql", config = @SqlConfig(encoding = "UTF-8"))
+@Sql(scripts = "classpath:data-dev.sql", config = @SqlConfig(encoding = "UTF-8"))
 class TopicServiceTest {
 
     @Autowired

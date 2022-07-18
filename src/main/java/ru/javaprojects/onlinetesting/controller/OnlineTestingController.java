@@ -20,7 +20,7 @@ import java.util.Map;
 @Controller
 public class OnlineTestingController {
     public static final String TOPIC_NAME = "topicName";
-    public static final String QUESTIONS_AMOUNT = "questionsAmount";
+    public static final String ANSWERS_AMOUNT = "answersAmount";
     public static final String QUESTIONS = "questions";
     public static final String CURRENT_QUESTION = "currentQuestion";
     public static final String WRONG_ANSWERS = "wrongAnswers";
@@ -51,7 +51,7 @@ public class OnlineTestingController {
         Collections.shuffle(questions);
         Question currentQuestion = questions.remove(0);
         session.setAttribute(TOPIC_NAME, topicName);
-        session.setAttribute(QUESTIONS_AMOUNT, 0);
+        session.setAttribute(ANSWERS_AMOUNT, 0);
         session.setAttribute(QUESTIONS, questions);
         session.setAttribute(CURRENT_QUESTION, currentQuestion);
         session.setAttribute(WRONG_ANSWERS, new HashMap<Question, String>());
@@ -76,8 +76,8 @@ public class OnlineTestingController {
         if (questionNotCurrent(question, currentQuestion)) {
             return questionPage((String) session.getAttribute(TOPIC_NAME), currentQuestion, model);
         } else {
-            int questionsAmount = (int) session.getAttribute(QUESTIONS_AMOUNT);
-            session.setAttribute(QUESTIONS_AMOUNT, ++questionsAmount);
+            int answersAmount = (int) session.getAttribute(ANSWERS_AMOUNT);
+            session.setAttribute(ANSWERS_AMOUNT, ++answersAmount);
             if (!answer.equalsIgnoreCase(currentQuestion.getCorrectAnswer())) {
                 Map<Question, String> wrongAnswers = (Map<Question, String>) session.getAttribute(WRONG_ANSWERS);
                 wrongAnswers.put(currentQuestion, answer);
@@ -100,7 +100,7 @@ public class OnlineTestingController {
     private String resultPage(HttpSession session, Model model) {
         model.addAttribute(TOPIC_NAME, session.getAttribute(TOPIC_NAME));
         model.addAttribute(WRONG_ANSWERS, session.getAttribute(WRONG_ANSWERS));
-        model.addAttribute(QUESTIONS_AMOUNT, session.getAttribute(QUESTIONS_AMOUNT));
+        model.addAttribute(ANSWERS_AMOUNT, session.getAttribute(ANSWERS_AMOUNT));
         session.invalidate();
         return "result";
     }

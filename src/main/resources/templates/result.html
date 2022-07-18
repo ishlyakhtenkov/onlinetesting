@@ -8,8 +8,8 @@
         <div class="container mt-3">
             <div class="ml-3">
                 <h4 class="font-weight-bold text-secondary" th:text="'Test topic: ' + ${topicName}"></h4>
-                <h5 class="font-weight-bold" th:text="'Total questions: ' + ${questionsAmount}"></h5>
-                <h5 class="font-weight-bold" th:text="'Correct answers: ' + ${questionsAmount - wrongAnswers.size()}"></h5>
+                <h5 class="font-weight-bold" th:text="'Total questions: ' + ${answersAmount}"></h5>
+                <h5 class="font-weight-bold" th:text="'Correct answers: ' + ${answersAmount - wrongAnswers.size()}"></h5>
                 <h5 class="font-weight-bold" th:text="'Wrong answers: ' + ${wrongAnswers.size()}"></h5>
                 <table class="table mt-3 mb-5" th:if="${wrongAnswers.size() != 0}">
                     <thead class="thead-light h4">
@@ -27,7 +27,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <h4 class="font-weight-bold mt-3" th:if="${wrongAnswers.size() == 0 && questionsAmount != 0}">Congratulations! You do not have wrong answers!</h4>
+                <h4 class="font-weight-bold mt-3" th:if="${wrongAnswers.size() == 0 && answersAmount != 0}">Congratulations! You do not have wrong answers!</h4>
             </div>
         </div>
 

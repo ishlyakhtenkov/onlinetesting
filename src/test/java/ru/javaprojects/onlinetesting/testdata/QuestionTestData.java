@@ -5,6 +5,7 @@ import ru.javaprojects.onlinetesting.model.Question;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static ru.javaprojects.onlinetesting.model.AbstractBaseEntity.START_SEQ;
 
@@ -17,6 +18,9 @@ public class QuestionTestData {
     public static final Question mathQuestion3;
     public static final Question noCorrectAnswerQuestion;
     public static final Question noAnswersQuestion;
+    public static final String INCORRECT_ANSWER = "-100500";
+    public static final Map<Question, String> WRONG_ANSWERS_MAP;
+
 
     static {
         List<Answer> mathQuestion1Answers = List.of(new Answer("5", false), new Answer("3", false), new Answer("4", true));
@@ -28,5 +32,6 @@ public class QuestionTestData {
         List<Answer> noCorrectAnswerQuestionAnswers = List.of(new Answer("ABC", false), new Answer("XYZ", false));
         noCorrectAnswerQuestion = new Question(null, "All answers are incorrect!", noCorrectAnswerQuestionAnswers);
         noAnswersQuestion = new Question(null, "There are no answers at all", Collections.emptyList());
+        WRONG_ANSWERS_MAP = Map.of(mathQuestion1, INCORRECT_ANSWER, mathQuestion2, INCORRECT_ANSWER);
     }
 }

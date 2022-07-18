@@ -16,7 +16,7 @@ import static ru.javaprojects.onlinetesting.testdata.TopicTestData.MATH_TOPIC_NA
 
 @SpringBootTest
 @ActiveProfiles("dev")
-@Sql(scripts = "classpath:data.sql", config = @SqlConfig(encoding = "UTF-8"))
+@Sql(scripts = "classpath:data-dev.sql", config = @SqlConfig(encoding = "UTF-8"))
 class QuestionServiceTest {
 
     @Autowired
