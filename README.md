@@ -1,4 +1,4 @@
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/597b9d69d7c54f809c4bde95679668e9)](https://www.codacy.com/gh/igar15/onlinetesting/dashboard)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/597b9d69d7c54f809c4bde95679668e9)](https://www.codacy.com/gh/ishlyakhtenkov/onlinetesting/dashboard)
 [![Build Status](https://api.travis-ci.com/ishlyakhtenkov/onlinetesting.svg?branch=master)](https://app.travis-ci.com/ishlyakhtenkov/onlinetesting)
 
 Online Testing project 
