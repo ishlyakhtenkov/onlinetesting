@@ -7,18 +7,18 @@
 
         <div class="container mt-3">
             <div class="ml-3">
-                <h4 class="font-weight-bold text-secondary" th:text="'Test topic: ' + ${topicName}"></h4>
-                <h5 class="font-weight-bold" th:text="'Total questions: ' + ${answersAmount}"></h5>
-                <h5 class="font-weight-bold" th:text="'Correct answers: ' + ${answersAmount - wrongAnswers.size()}"></h5>
-                <h5 class="font-weight-bold" th:text="'Wrong answers: ' + ${wrongAnswers.size()}"></h5>
-                <table class="table mt-3 mb-5" th:if="${wrongAnswers.size() != 0}">
+                <h4 class="font-weight-bold text-secondary" th:text="'Test topic: ' + ${session.topicName}"></h4>
+                <h5 class="font-weight-bold" th:text="'Total questions: ' + ${session.answersAmount}"></h5>
+                <h5 class="font-weight-bold" th:text="'Correct answers: ' + ${session.answersAmount - session.wrongAnswers.size()}"></h5>
+                <h5 class="font-weight-bold" th:text="'Wrong answers: ' + ${session.wrongAnswers.size()}"></h5>
+                <table class="table mt-3" th:if="${session.wrongAnswers.size() != 0}">
                     <thead class="thead-light h4">
                         <tr>
                             <th>Wrong answers</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="tempAnswer : ${wrongAnswers}">
+                        <tr th:each="tempAnswer : ${session.wrongAnswers}">
                             <td>
                                 <h6 class="font-weight-bold" th:text="'Question: ' + ${tempAnswer.key.content}"></h6>
                                 <h6 class="font-weight-bold" th:text="'Correct answer: ' + ${tempAnswer.key.getCorrectAnswer()}"></h6>
@@ -27,7 +27,10 @@
                         </tr>
                     </tbody>
                 </table>
-                <h4 class="font-weight-bold mt-3" th:if="${wrongAnswers.size() == 0 && answersAmount != 0}">Congratulations! You do not have wrong answers!</h4>
+                <h4 class="font-weight-bold mt-3" th:if="${session.wrongAnswers.size() == 0 && session.answersAmount != 0}">Congratulations! You do not have wrong answers!</h4>
+                <div class="mt-4 mb-4">
+                    <a th:href="@{/}" class="btn btn-primary">Back to Home</a>
+                </div>
             </div>
         </div>
 

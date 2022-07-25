@@ -12,13 +12,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.javaprojects.onlinetesting.model.Question;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -47,11 +45,8 @@ class OnlineTestingControllerTest {
     void startTest() throws Exception {
         HttpSession session = mockMvc.perform(post("/startTest")
                 .param(TOPIC_NAME, MATH_TOPIC_NAME))
-                .andExpect(status().isOk())
-                .andExpect(model().size(2))
-                .andExpect(model().attribute(TOPIC_NAME, MATH_TOPIC_NAME))
-                .andExpect(model().attributeExists(CURRENT_QUESTION))
-                .andExpect(view().name("question"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/question"))
                 .andReturn()
                 .getRequest()
                 .getSession();
@@ -69,11 +64,8 @@ class OnlineTestingControllerTest {
                 .param("question", mathQuestion1.getContent())
                 .param("answer", mathQuestion1.getCorrectAnswer())
                 .session(createMockSession(MATH_TOPIC_NAME, 0, List.of(mathQuestion2, mathQuestion3), mathQuestion1, new HashMap<>())))
-                .andExpect(status().isOk())
-                .andExpect(model().size(2))
-                .andExpect(model().attribute(TOPIC_NAME, MATH_TOPIC_NAME))
-                .andExpect(model().attribute(CURRENT_QUESTION, mathQuestion2))
-                .andExpect(view().name("question"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/question"))
                 .andReturn()
                 .getRequest()
                 .getSession();
@@ -90,11 +82,8 @@ class OnlineTestingControllerTest {
                 .param("question", mathQuestion1.getContent())
                 .param("answer", INCORRECT_ANSWER)
                 .session(createMockSession(MATH_TOPIC_NAME, 0, List.of(mathQuestion2, mathQuestion3), mathQuestion1, new HashMap<>())))
-                .andExpect(status().isOk())
-                .andExpect(model().size(2))
-                .andExpect(model().attribute(TOPIC_NAME, MATH_TOPIC_NAME))
-                .andExpect(model().attribute(CURRENT_QUESTION, mathQuestion2))
-                .andExpect(view().name("question"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/question"))
                 .andReturn()
                 .getRequest()
                 .getSession();
@@ -106,16 +95,13 @@ class OnlineTestingControllerTest {
     }
 
     @Test
-    void checkAnswerWhenQuestionNotCurrent() throws Exception {
+    void checkAnswerWhenQuestionIsNotCurrent() throws Exception {
         HttpSession session = mockMvc.perform(post("/checkAnswer")
                 .param("question", mathQuestion1.getContent())
                 .param("answer", mathQuestion1.getCorrectAnswer())
                 .session(createMockSession(MATH_TOPIC_NAME, 1, List.of(mathQuestion3), mathQuestion2, new HashMap<>())))
-                .andExpect(status().isOk())
-                .andExpect(model().size(2))
-                .andExpect(model().attribute(TOPIC_NAME, MATH_TOPIC_NAME))
-                .andExpect(model().attribute(CURRENT_QUESTION, mathQuestion2))
-                .andExpect(view().name("question"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/question"))
                 .andReturn()
                 .getRequest()
                 .getSession();
@@ -131,7 +117,8 @@ class OnlineTestingControllerTest {
         mockMvc.perform(post("/checkAnswer")
                 .param("question", mathQuestion2.getContent())
                 .session(createMockSession(MATH_TOPIC_NAME, 1, List.of(mathQuestion3), mathQuestion2, new HashMap<>())))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("error"));
     }
 
     @Test
@@ -139,59 +126,152 @@ class OnlineTestingControllerTest {
         mockMvc.perform(post("/checkAnswer")
                 .param("answer", mathQuestion2.getContent())
                 .session(createMockSession(MATH_TOPIC_NAME, 1, List.of(mathQuestion3), mathQuestion2, new HashMap<>())))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("error"));
     }
 
     @Test
-    void checkAnswerAndShowResultWhenNoWrongAnswers() throws Exception {
-        mockMvc.perform(post("/checkAnswer")
+    void checkAnswerWhenLastQuestionAndNoWrongAnswers() throws Exception {
+        HttpSession session = mockMvc.perform(post("/checkAnswer")
                 .param("question", mathQuestion3.getContent())
                 .param("answer", mathQuestion3.getCorrectAnswer())
-                .session(createMockSession(MATH_TOPIC_NAME, 2, List.of(), mathQuestion3, new HashMap<>())))
-                .andExpect(status().isOk())
-                .andExpect(model().size(3))
-                .andExpect(model().attribute(TOPIC_NAME, MATH_TOPIC_NAME))
-                .andExpect(model().attribute(WRONG_ANSWERS, new HashMap<Question, String>()))
-                .andExpect(model().attribute(ANSWERS_AMOUNT, 3))
-                .andExpect(view().name("result"));
+                .session(createMockSession(MATH_TOPIC_NAME, 2, emptyList(), mathQuestion3, new HashMap<>())))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/result"))
+                .andReturn()
+                .getRequest()
+                .getSession();
+
+        assertEquals(emptyList(), session.getAttribute(QUESTIONS));
+        assertEquals(MATH_TOPIC_NAME, session.getAttribute(TOPIC_NAME));
+        assertEquals(3, session.getAttribute(ANSWERS_AMOUNT));
+        assertEquals(emptyMap(), session.getAttribute(WRONG_ANSWERS));
     }
 
     @Test
-    void checkAnswerAndShowResultWhenHasWrongAnswers() throws Exception {
+    void checkAnswerWhenLastQuestionAndHasWrongAnswers() throws Exception {
+        HttpSession session = mockMvc.perform(post("/checkAnswer")
+                .param("question", mathQuestion3.getContent())
+                .param("answer", mathQuestion3.getCorrectAnswer())
+                .session(createMockSession(MATH_TOPIC_NAME, 2, emptyList(), mathQuestion3, WRONG_ANSWERS_MAP)))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/result"))
+                .andReturn()
+                .getRequest()
+                .getSession();
+
+        assertEquals(emptyList(), session.getAttribute(QUESTIONS));
+        assertEquals(MATH_TOPIC_NAME, session.getAttribute(TOPIC_NAME));
+        assertEquals(3, session.getAttribute(ANSWERS_AMOUNT));
+        assertEquals(WRONG_ANSWERS_MAP, session.getAttribute(WRONG_ANSWERS));
+    }
+
+    @Test
+    void getQuestionWhenNoCurrentQuestion() throws Exception {
+        MockHttpSession mockSession = createMockSession(MATH_TOPIC_NAME, 3, emptyList(), mathQuestion3, new HashMap<>());
+        mockSession.removeAttribute(CURRENT_QUESTION);
+        mockMvc.perform(get("/question")
+                .session(mockSession))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("error"));
+    }
+
+    @Test
+    void checkAnswerWhenNoCurrentQuestion() throws Exception {
+        MockHttpSession mockSession = createMockSession(MATH_TOPIC_NAME, 3, emptyList(), mathQuestion3, new HashMap<>());
+        mockSession.removeAttribute(CURRENT_QUESTION);
         mockMvc.perform(post("/checkAnswer")
                 .param("question", mathQuestion3.getContent())
                 .param("answer", mathQuestion3.getCorrectAnswer())
-                .session(createMockSession(MATH_TOPIC_NAME, 2, List.of(), mathQuestion3, WRONG_ANSWERS_MAP)))
-                .andExpect(status().isOk())
-                .andExpect(model().size(3))
-                .andExpect(model().attribute(TOPIC_NAME, MATH_TOPIC_NAME))
-                .andExpect(model().attribute(WRONG_ANSWERS, WRONG_ANSWERS_MAP))
-                .andExpect(model().attribute(ANSWERS_AMOUNT, 3))
-                .andExpect(view().name("result"));
+                .session(mockSession))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("error"));
     }
 
     @Test
     void interruptTestWhenNoWrongAnswers() throws Exception {
-        mockMvc.perform(post("/interruptTest")
-                .session(createMockSession(MATH_TOPIC_NAME, 2, List.of(), mathQuestion3, new HashMap<>())))
-                .andExpect(status().isOk())
-                .andExpect(model().size(3))
-                .andExpect(model().attribute(TOPIC_NAME, MATH_TOPIC_NAME))
-                .andExpect(model().attribute(WRONG_ANSWERS, new HashMap<Question, String>()))
-                .andExpect(model().attribute(ANSWERS_AMOUNT, 2))
-                .andExpect(view().name("result"));
+        HttpSession session = mockMvc.perform(post("/interruptTest")
+                .session(createMockSession(MATH_TOPIC_NAME, 2, emptyList(), mathQuestion3, new HashMap<>())))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/result"))
+                .andReturn()
+                .getRequest()
+                .getSession();
+
+        assertEquals(emptyList(), session.getAttribute(QUESTIONS));
+        assertEquals(MATH_TOPIC_NAME, session.getAttribute(TOPIC_NAME));
+        assertEquals(2, session.getAttribute(ANSWERS_AMOUNT));
+        assertEquals(emptyMap(), session.getAttribute(WRONG_ANSWERS));
     }
 
     @Test
     void interruptTestWhenHasWrongAnswers() throws Exception {
+        HttpSession session = mockMvc.perform(post("/interruptTest")
+                .session(createMockSession(MATH_TOPIC_NAME, 2, emptyList(), mathQuestion3, WRONG_ANSWERS_MAP)))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/result"))
+                .andReturn()
+                .getRequest()
+                .getSession();
+
+        assertEquals(emptyList(), session.getAttribute(QUESTIONS));
+        assertEquals(MATH_TOPIC_NAME, session.getAttribute(TOPIC_NAME));
+        assertEquals(2, session.getAttribute(ANSWERS_AMOUNT));
+        assertEquals(WRONG_ANSWERS_MAP, session.getAttribute(WRONG_ANSWERS));
+    }
+
+    @Test
+    void interruptTestWhenNoCurrentQuestion() throws Exception {
+        MockHttpSession mockSession = createMockSession(MATH_TOPIC_NAME, 3, emptyList(), mathQuestion3, new HashMap<>());
+        mockSession.removeAttribute(CURRENT_QUESTION);
         mockMvc.perform(post("/interruptTest")
-                .session(createMockSession(MATH_TOPIC_NAME, 2, List.of(), mathQuestion3, WRONG_ANSWERS_MAP)))
+                .session(mockSession))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("error"));
+    }
+
+    @Test
+    void showResultWhenNoWrongAnswers() throws Exception {
+        HttpSession session = mockMvc.perform(get("/result")
+                .session(createMockSession(MATH_TOPIC_NAME, 3, emptyList(), mathQuestion3, new HashMap<>())))
                 .andExpect(status().isOk())
-                .andExpect(model().size(3))
-                .andExpect(model().attribute(TOPIC_NAME, MATH_TOPIC_NAME))
-                .andExpect(model().attribute(WRONG_ANSWERS, WRONG_ANSWERS_MAP))
-                .andExpect(model().attribute(ANSWERS_AMOUNT, 2))
-                .andExpect(view().name("result"));
+                .andExpect(view().name("result"))
+                .andReturn()
+                .getRequest()
+                .getSession();
+
+        assertNull(session.getAttribute(QUESTIONS));
+        assertNull(session.getAttribute(CURRENT_QUESTION));
+        assertEquals(MATH_TOPIC_NAME, session.getAttribute(TOPIC_NAME));
+        assertEquals(3, session.getAttribute(ANSWERS_AMOUNT));
+        assertEquals(emptyMap(), session.getAttribute(WRONG_ANSWERS));
+    }
+
+    @Test
+    void showResultWhenHasWrongAnswers() throws Exception {
+        HttpSession session = mockMvc.perform(get("/result")
+                .session(createMockSession(MATH_TOPIC_NAME, 3, emptyList(), mathQuestion3, WRONG_ANSWERS_MAP)))
+                .andExpect(status().isOk())
+                .andExpect(view().name("result"))
+                .andReturn()
+                .getRequest()
+                .getSession();
+
+        assertNull(session.getAttribute(QUESTIONS));
+        assertNull(session.getAttribute(CURRENT_QUESTION));
+        assertEquals(MATH_TOPIC_NAME, session.getAttribute(TOPIC_NAME));
+        assertEquals(3, session.getAttribute(ANSWERS_AMOUNT));
+        assertEquals(WRONG_ANSWERS_MAP, session.getAttribute(WRONG_ANSWERS));
+    }
+
+    @Test
+    void showResultWhenNoAnswersAmount() throws Exception {
+        MockHttpSession mockSession = createMockSession(MATH_TOPIC_NAME, 3, emptyList(), mathQuestion3, new HashMap<>());
+        mockSession.removeAttribute(ANSWERS_AMOUNT);
+        mockMvc.perform(get("/result")
+                .session(mockSession))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("error"));
     }
 
     @Test

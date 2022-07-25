@@ -6,12 +6,12 @@
         <div th:replace="fragments/header-fragment"></div>
 
         <div class="container mt-3">
-            <h4 class="font-weight-bold text-secondary" th:text="'Test topic: ' + ${topicName}"></h4>
+            <h4 class="font-weight-bold text-secondary" th:text="'Test topic: ' + ${session.topicName}"></h4>
             <form th:action="@{/checkAnswer}" method="post">
                 <div class="form-group row px-3">
-                    <h5 class="font-weight-bold mb-3" th:text="${currentQuestion.content}">Question</h5>
-                    <input type="hidden" th:name="question" th:value="${currentQuestion.content}">
-                    <div class="form-check px-5" th:each="tempAnswer : ${currentQuestion.answers}">
+                    <h5 class="font-weight-bold mb-3" th:text="${session.currentQuestion.content}">Question</h5>
+                    <input type="hidden" th:name="question" th:value="${session.currentQuestion.content}">
+                    <div class="form-check px-5" th:each="tempAnswer : ${session.currentQuestion.answers}">
                         <input type="radio" required class="form-check-input" th:name="answer" th:text="${tempAnswer.content}" th:value="${tempAnswer.content}" />
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                     <!-- Modal footer -->
                     <div class="modal-footer">
                         <form th:action="@{/interruptTest}" method="post">
-                            <button type="submit" class="btn btn-danger">Interrupt test</button>
+                            <button id="closemodal" type="submit" class="btn btn-danger" data-bs-dismiss="modal">Interrupt test</button>
                         </form>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
