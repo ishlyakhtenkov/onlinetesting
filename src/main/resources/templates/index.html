@@ -10,12 +10,12 @@
                 <h4>Please select the topic you want to test:</h4>
                 <form th:action="@{/startTest}" method="post">
                     <div class="row align-items-end">
-                        <div class="col-2">
+                        <div class="col-xl-2 col-md-3 col-5">
                             <select class="form-select col-2 mt-3" th:name="topicName">
                                 <option th:each="tempTopic : ${topics}" th:value="${tempTopic.name}" th:text="${tempTopic.name}"></option>
                             </select>
                         </div>
-                        <div class="col-2">
+                        <div class="col-4">
                             <button type="submit" class="btn btn-primary ml-2">Start test!</button>
                         </div>
                     </div>
